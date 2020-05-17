@@ -1,0 +1,216 @@
+//Dave Makin 
+//SDEV 120 
+//5-5-2020
+//Programming Challenge #6, page 405
+//Play the card game War 
+//Program Name: War Card Game
+//Program version: 1.0
+//
+Main Module 
+Call DeclareVariables
+	Call Define Cards 
+	Call Build Deck 
+	Call Welcome 
+Call Get Rounds
+Call Shuffle Deck
+Call Coin Flip
+Call Play Game
+Call Show Score
+End Main Program 
+//
+// Declare and initialize variables
+DeclareVariables
+Declare CardName[13] STRING
+Declare SuitName[4] STRING
+Declare Deck[52,2] STRING
+Declare Player1, Player2 STRING
+Declare Count, Position, X, Y,Shuffle INT
+Declare Player1Score INT
+Declare Player2Score INT
+Declare Rcard1, Rcard2, TempCard[1,1] STRING
+Set Count = 0
+Set X = 0
+Set Y = 0
+Set Shuffle = 0
+FOR X = 1 to 52
+	Set Deck[X,0] = “a”
+	Set Deck[X,1] = “a”
+NEXT X
+FOR X = 1 to 13
+	Set CardName[X] = “a”
+NEXT X
+FOR X = 1 to 4
+	Set SuitName[X] = “a”
+NEXT X
+Set X = 0
+Set Position = 0
+Set Rcard1 = 0
+Set Rcard2 = 0
+Set TempCard[0,0] = “a”
+Set Player1 = “a”
+Set Player2 = “a”
+Set Player1Score = 0
+Set Player2Score = 0
+End DeclareVariables
+// Assign each card number and suit to a particular position in separate arrays
+Define Cards
+Set CardName[0] = “Ace”
+Set CardName[1] = “2”
+Set CardName[2] = “3”
+Set CardName[3] = “4”
+Set CardName[4] = “5”
+Set CardName[5] = “6”
+Set CardName[6] = “7”
+Set CardName[7] = “8”
+Set CardName[8] = “9”
+Set CardName[9] = “10”
+Set CardName[10] = “Jack”
+Set CardName[11] = “Queen”
+Set CardName[12] = “King”
+	Set SuitName[0] = “Spades”
+	Set SuitName[1] = “Hearts”
+	Set SuitName[2] = “Clubs”
+	Set SuitName[3] = “Diamonds”
+End Define Cards
+//This loop combines the name of the card with its suit and saves having to define each element manually
+//Y determines the suit, X determines the card, Count determines card’s score value
+//Position determines the location in the deck
+Build Deck 
+	FOR (Y = -1; Y < 3; Y++)
+		Count = 0
+		FOR (X = -1; X < 12; X++	)
+			Count++
+			Position++
+//Name of card
+			Set Deck[Position,0] = CardName[X] + “ of + “ + SuitName[Y]
+//Value of card	
+			Set Deck[Position,1] = Count
+		NEXT Y
+	NEXT X
+	Set Count = 0
+	Set Position = 0
+End Build Deck 
+//
+//Shuffle the cards to randomize the draw  
+Shuffle Deck
+//Shuffle the order of cards to randomize the play rather than randomly
+//selecting cards and dealing with repeats.
+//Create two random numbers to select which cards to swap in the deck
+//Using a temporary card, exchange the order of the two random cards
+//
+//To ensure good randomization, shuffle 50x the amount the user entered
+While (Count=0; Count <= Shuffle * 50; Count++)
+//Choose two random card locations
+Set Rcard1 = [Floor(Random(Shuffle) * 52) + 1]
+	Set Rcard2 = [Floor(Random(Shuffle + 1) * 52) + 1]
+//Create a copy of the first card and its rank
+Set TempCard[Rcard1,0] = Deck[Rcard1,0]
+Set TempCard[Rcard1,1] = Deck[Rcard1,1]
+//
+//Move the second card into the first card’s position
+Set Deck[Rcard1,0] = Deck[Rcard2,0]
+Set Deck[Rcard1,1]= Deck[Rcard2,1]
+//
+//Replace the second card with the first card
+	Set Deck[Rcard2,0] = TempCard[Rcard1,0]
+Set Deck[Rcard2,1] = TempCard[Rcard1,1]
+End While
+End Shuffle Deck 
+//
+//Display Welcome Message, get shuffle count and player names
+Welcome
+Write “Welcome to the game of War!”
+	Write “We’ll draw the cards and keep score for you.”
+	Write “”
+	Write “Enter Player 1’s name:”
+	Input Player1
+	Write “Enter Player 2’s name:”
+	Input Player2
+	Write “How many times would you like to shuffle the deck?”
+	Input Shuffle
+	Write “You can play between 1 and 13 rounds.”
+	Write “How many rounds would you like to play?”
+End Welcome
+//
+// Get the number of rounds they want to play
+Get Rounds
+Input Rounds
+	If Rounds < 1 OR > 26 THEN
+		Write “Sorry, you can only play between 1 and 13 rounds.”
+		Write “Please choose again.”
+		Call Get Rounds
+	END IF
+End Get Rounds
+//
+// Flip a coin to see who goes first.
+Coin Flip
+	Write “Here we go.”
+Write “Flipping a coin to see who goes first……”
+Set Flip = [Floor(Random() * 2) + 1]
+IF Flip = 1 THEN
+	Write Player1 + “ won the toss!”
+ELSE
+	Write Player2 + “ won the toss!”
+END IF
+End Coin Flip
+//
+// Play the game
+Play Game
+While (Count = 0, Count < Rounds * 2; Count++)
+	IF Flip = 2 THEN
+			Write Player2 + “ played the “ + Deck[Count,0]
+			Count++
+			Write Player1 + “ played the “ + Deck[Count,0]
+			CALL Score21
+	ELSE
+			Write Player1 + “ played the “ + Deck[Count,1]
+			Count++
+			Write Player2 + “ played the “ + Deck[Count,0]
+			CALL Score12
+		End IF
+// Display the score at the halfway point as long as they chose more than 5 rounds
+IF Count /2 = Floor(Rounds/2) OR > Floor(Rounds/2) AND Rounds > 5 THEN
+			Write “We’re at the halfway point and the score is:”
+END IF
+		IF Player1Score > Player2Score THEN
+			Write Player1Score + “ to “ + Player2Score + “- “ + Player1 + “ is ahead.”
+END IF
+IF Player2Score > Player1Score THEN
+			Write Player1Score + “ to “ + Player2Score + “- “ + Player2 + “ is ahead.”
+		ELSE
+			Write Player1Score + “ to “ + Player2Score + “- It’s all tied up
+END IF
+END WHILE
+End Play Game 
+//
+// Calculate score when player order is 21
+Score21
+IF Deck[Count -1,1] > Deck[Count,1] THEN
+	Player2Score++
+END IF
+If Deck[Count - 1,1] <  Deck[Count,1] THEN
+	Player1Score++
+END IF
+End Score21
+//
+// Calculate score when player order is 12
+Score12
+IF Deck[Count -1,1] > Deck[Count,1] THEN
+		Player1Score++
+END IF
+If Deck[Count - 1,1] <  Deck[Count,1] THEN
+		Player2Score++
+END IF
+End Score12
+//
+// Display the final score
+Show Score
+IF Player1Score > Player2Score THEN
+	   Write “The final score is: “ + Player1Score + “ to “ + Player2Score + “- “ + Player1 + “ won the game!”
+END IF
+IF Player2Score > Player1Score THEN
+		Write “The final score is: “ +Player1Score + “ to “ + Player2Score + “- “ + Player2 + “ won the game!”
+	ELSE
+		Write “The final score is: “ +Player1Score + “ to “ + Player2Score + “- A tie game!”
+END IF
+End Show Score
